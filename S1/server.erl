@@ -11,18 +11,18 @@ start() ->
 process_requests(Clients) ->
     receive
         {client_join_req, Name, From} ->
-            NewClients = [...|Clients],  %% TODO: COMPLETE
+            NewClients = [ {Name, From} | Clients],  %% Add new client to the list
             broadcast(NewClients, {join, Name}),
-            process_requests(...);  %% TODO: COMPLETE
+            process_requests(NewClients);  %% Listen remaining
 
         {client_leave_req, Name, From} ->
-            NewClients = lists:delete(..., Clients),  %% TODO: COMPLETE
-            broadcast(Clients, ...),  %% TODO: COMPLETE
+            NewClients = lists:delete({Name, From}, Clients),  %% Delete client from list
+            broadcast(Clients, {leave, Name}),  %% Notify user logoff to rest of clients
             From ! exit,
-            process_requests(...);  %% TODO: COMPLETE
+            process_requests(NewClients);  %% Listen remaining
 
         {send, Name, Text} ->
-            broadcast(..., ...),  %% TODO: COMPLETE
+            broadcast(Clients, {message, Name, Text}),  %% Message propagate
             process_requests(Clients);
 
         disconnect ->
