@@ -1,4 +1,4 @@
-# Chat implementation #
+# Chatty #
 
 ## Structure ##
 > First implementation has one server receiving and some clients
