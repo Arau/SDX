@@ -11,7 +11,7 @@ start() ->
 process_requests(Clients) ->
     receive
         {client_join_req, Name, From} ->
-            NewClients = [ {Name, From} | Clients],  %% Add new client to the list
+            NewClients = [ From | Clients],  %% Add new client to the list
             broadcast(NewClients, {join, Name}),
             process_requests(NewClients);  %% Listen remaining
 
@@ -27,7 +27,7 @@ process_requests(Clients) ->
 
         disconnect ->
             unregister(myserver)
-end.
+    end.
 
 %% Local Functions
 broadcast(PeerList, Message) ->
