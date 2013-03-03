@@ -49,6 +49,7 @@ process_requests(Clients, Servers) ->
         {server_join_req, From} ->
             NewServers = [From | Servers],                       %% Add new server to list
             broadcast(NewServers, {update_servers, NewServers}), %% Notify to servers new connected server.
+            broadcast(Clients,{update_servers, From}),           %% Notify to clients new connected server.
             process_requests(Clients, NewServers);
 
         {update_servers, NewServers} ->
