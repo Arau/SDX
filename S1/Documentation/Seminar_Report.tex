@@ -1,0 +1,118 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage[utf8]{inputenc} % Change according your file encoding
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{caption}
+\usepackage{subcaption}
+
+%% Estil de Paràgraf
+\setlength{\parskip}{4mm}
+\setlength{\parindent}{0mm}
+
+%opening
+\title{Seminar Report: Chatty}
+\author{Martín Garcia i Ferran Arau}
+\date{\today{}}
+
+\begin{document}
+
+\maketitle
+
+\section{Introducció}
+
+% Introduce in a couple of sentences the seminar and the main topic related to
+% distributed systems it covers.
+
+El seminari té com objectiu desenvolupar un sistema de ''chat'' distribuit
+utilizant el paradigma client-servidor mitjançant events. Hi ha de dues
+implementacions que cal desenvolupar.
+
+En primer lloc els clients envien missatges a un únic servidor i aquest els
+distribueix a la resta. 
+
+En segon lloc, cal desenvolupar un sistema més robust ja que la primera
+implementació presenta un únic punt de fallada crític, el servidor. Consisteix
+en disposar de diverses instàncies ''Servidor'' i que aquestes es comuniquin
+entre si. Els clients poden establir conexió amb qualsevol dels servidors i
+aquests facilitaran els missatges rebuts a la resta de servidors propagant així
+els missatges fins als clients últims.
+
+\section{Feina de laboratori}
+
+% Present the new code that you have added or how you have implemented a
+% required functionality by using small Erlang code snippets (you do not need to
+% copy\&paste all the code).
+
+A continuació es presenten les dues implementacions del sistema de ''chat''. Es
+mostren les diferències entre el codi original i el de producció mitjançant les
+eines de ''history'' que proporciona el repositori utilitzat. 
+Es pot consultar el codi de aquesta sessió a
+\url{https://github.com/magarcia/SDX/tree/master/S1}
+
+\section{Experiments}
+
+% Describe the experiments you did and provide evidence of the results you got
+% (e.g., use screenshots). In addition, you may provide figures or tables with
+% experimental results of the system evaluation. For each seminar, we will
+% provide you with some guidance on which kind of evaluation you should do.
+
+Per la primera implementació s'ha provat que el ''chat'' era funcional, és a
+dir, s'ha vist que diversos clients es podien comunicar entre si. Tots els
+clients poden veure tots els missatges.  També s'ha provat de deshabilitar el
+servidor. Els resultats han estat els esperats, la comunicació entre els clients
+s'ha vist afectada.
+
+Exemple de prova de la segona implementació amb 2 servidors:
+
+\begin{figure}[ht]
+    \centering
+    \caption{Implementaci\'o 2}
+    \begin{subfigure}[b]{0.8\textwidth}
+        \caption{Servidor primari}
+        \includegraphics[width=1.0\textwidth]{figures/ServerA.png}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.8\textwidth}
+        \caption{Servidor secondari}
+        \includegraphics[width=1.0\textwidth]{figures/ServerB.png}
+    \end{subfigure}    
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+        \begin{subfigure}[b]{0.8\textwidth}
+        \caption{Client 1}
+        \includegraphics[width=1.0\textwidth]{figures/Al.png}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.8\textwidth}
+        \caption{Client 2}
+        \includegraphics[width=1.0\textwidth]{figures/Bob.png}
+    \end{subfigure}    
+    
+    
+    \begin{subfigure}[b]{0.8\textwidth}
+        \caption{Client 3}
+        \includegraphics[width=1.0\textwidth]{figures/Cam.png}
+    \end{subfigure}    
+        
+    \begin{subfigure}[b]{0.8\textwidth}
+        \caption{Client 4}
+        \includegraphics[width=1.0\textwidth]{figures/Dave.png}
+    \end{subfigure}    
+
+\end{figure}
+
+\section{Open questions}
+
+% Try to answer all the open questions in the documentation. When possible, do
+% experiments to support your answers.
+
+\section{Personal Opinion}
+
+% Your personal opinion of the seminar, including whether it should be included
+% in next year's course or not.
+
+\end{document}
+
