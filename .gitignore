@@ -1,6 +1,37 @@
-.eunit
-deps
-*.o
+#### Erlang ####
 *.beam
+*.dump
+deps
+.eunit
 *.plt
+*.o
+
+#### LaTeX ####
+*.acn
+*.acr
+*.alg
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.fdb_latexmk
+*.glo
+*.glg
+*.gls
+*.idx
+*.ist
+*.ilg
+*.ind
+*.log
+*.lof
+*.lot
+*.maf
+*.mtc
+*.mtc1
+*.out
+*.pdf
+*.synctex.gz
+*.toc
+
+#### Others ####
 *~
