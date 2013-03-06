@@ -15,6 +15,7 @@ deps
 *.blg
 *.dvi
 *.fdb_latexmk
+*.fls
 *.glo
 *.glg
 *.gls
