@@ -2,9 +2,11 @@
 \usepackage[utf8]{inputenc} % Change according your file encoding
 \usepackage{graphicx}
 \usepackage{url}
-\usepackage[margin=0.5in]{geometry}
+\usepackage[margin=1in]{geometry}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{float}
+
 
 %% Estil de Paràgraf
 \setlength{\parskip}{4mm}
@@ -12,7 +14,7 @@
 
 %opening
 \title{Seminar Report: Chatty}
-\author{Martín Garcia i Ferran Arau}
+\author{Martín Garcia \and Ferran Arau}
 \date{\today{}}
 
 \begin{document}
@@ -47,7 +49,8 @@ els missatges fins als clients últims.
 A continuació es presenten les dues implementacions del sistema de ''chat''. Es
 mostren les diferències entre el codi original i el de producció mitjançant les
 eines de ''history'' que proporciona el repositori utilitzat. 
-Es pot consultar el codi de aquesta sessió a
+
+Es pot consultar el codi d'aquesta sessió a
 \url{https://github.com/magarcia/SDX/tree/master/S1}
 
 \section{Experiments}
@@ -65,41 +68,48 @@ s'ha vist afectada.
 
 Exemple de prova de la segona implementació amb 2 servidors:
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
-    \caption{Implementaci\'o 2}
     \begin{subfigure}[b]{0.8\textwidth}
+        \includegraphics[width=1.0\textwidth]{figures/ServerA}
         \caption{Servidor primari}
-        \includegraphics[width=1.0\textwidth]{figures/ServerA.png}
+        \label{fig:firstserver}
     \end{subfigure}
     
     \begin{subfigure}[b]{0.8\textwidth}
+        \includegraphics[width=1.0\textwidth]{figures/ServerB}
         \caption{Servidor secondari}
-        \includegraphics[width=1.0\textwidth]{figures/ServerB.png}
-    \end{subfigure}    
+        \label{fig:secondserver}
+    \end{subfigure}
+
+    \begin{subfigure}[b]{0.8\textwidth}
+        \includegraphics[width=1.0\textwidth]{figures/Al}
+        \caption{Client 1}
+        \label{fig:firstclient}
+    \end{subfigure}
+
+    \caption{Implementaci\'o 2}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
-        \begin{subfigure}[b]{0.8\textwidth}
-        \caption{Client 1}
-        \includegraphics[width=1.0\textwidth]{figures/Al.png}
-    \end{subfigure}
     
     \begin{subfigure}[b]{0.8\textwidth}
+        \includegraphics[width=1.0\textwidth]{figures/Bob}
         \caption{Client 2}
-        \includegraphics[width=1.0\textwidth]{figures/Bob.png}
-    \end{subfigure}    
-    
-    
+        \label{fig:secondserver}
+    \end{subfigure}
+
     \begin{subfigure}[b]{0.8\textwidth}
+        \includegraphics[width=1.0\textwidth]{figures/Cam}
         \caption{Client 3}
-        \includegraphics[width=1.0\textwidth]{figures/Cam.png}
-    \end{subfigure}    
+        \label{fig:thirdserver}
+    \end{subfigure} 
         
     \begin{subfigure}[b]{0.8\textwidth}
+        \includegraphics[width=1.0\textwidth]{figures/Dave}
         \caption{Client 4}
-        \includegraphics[width=1.0\textwidth]{figures/Dave.png}
+        \label{fig:fourthserver}
     \end{subfigure}    
 
 \end{figure}
@@ -113,6 +123,7 @@ Exemple de prova de la segona implementació amb 2 servidors:
 
 % Your personal opinion of the seminar, including whether it should be included
 % in next year's course or not.
+
 
 \end{document}
 
