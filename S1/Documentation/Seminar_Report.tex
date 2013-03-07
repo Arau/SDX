@@ -80,18 +80,19 @@ s'ha vist afectada.
 A continuació es mostren les imatges que corroboren les proves fetes.
 
 \begin{center} 
-	\textbf{Implementació 1}
+    \textbf{Implementació 1}
 \end{center}
+
 \begin{figure}[H]
     \centering   
     \includegraphics[width=0.8\textwidth]{figures/Server1_start}
-    \caption{Servidor \label{fig:Impl1_Server}}    
+    \caption{Servidor \label{fig:Impl1_Server}}
 \end{figure}
-    
+
 \begin{figure}[H]
-    \centering   
+    \centering
 	\includegraphics[width=0.8\textwidth]{figures/Server1_Al}
-    \caption{Primer Client \label{fig:Impl1_Al}}	
+    \caption{Primer Client \label{fig:Impl1_Al}}
 \end{figure}
 
 \begin{figure}[H]
@@ -106,59 +107,78 @@ A continuació es mostren les imatges que corroboren les proves fetes.
     \caption{Tercer Client \label{fig:Impl1_Cam}}	
 \end{figure}
 
+S'ha pogut veure que els clients Alice, Bob i Cam es poden comunicar entre si. 
 
-Exemple de prova de la segona implementació amb 2 servidors:
+
+La segona implementació consta de dos servidors i quatre clients. Els clients Al i Bob estan conectats al servidor A, el primari. En canvi els clients Cam i Dave es comuniquen mitjançant el servidor secondari, el B.
+
+Si es desconecta el servidor secondari els clients Cam i Dave no poden enviar ni rebre events de manera que queden desconectats del ''chat''. 
+
+A continuació es presenten les imatges que certifiquen les comunicacions entre els diferents clients. 
+
+\begin{center} 
+    \textbf{Implementació 2}
+\end{center}
 
 \begin{figure}[H]
-    \centering
-    \begin{subfigure}[b]{0.8\textwidth}
-        \includegraphics[width=1.0\textwidth]{figures/ServerA}
-        \caption{Servidor primari}
-        \label{fig:firstserver}
-    \end{subfigure}
-    
-    \begin{subfigure}[b]{0.8\textwidth}
-        \includegraphics[width=1.0\textwidth]{figures/ServerB}
-        \caption{Servidor secondari}
-        \label{fig:secondserver}
-    \end{subfigure}
-
-    \begin{subfigure}[b]{0.8\textwidth}
-        \includegraphics[width=1.0\textwidth]{figures/Al}
-        \caption{Client 1}
-        \label{fig:firstclient}
-    \end{subfigure}
-
-    \caption{Implementació 2}
+	\centering
+    \includegraphics[width=0.8\textwidth]{figures/ServerA}
+    \caption{Servidor primari \label{fig:firstserver}}    
 \end{figure}
 
 \begin{figure}[H]
-    \centering
-    
-    \begin{subfigure}[b]{0.8\textwidth}
-        \includegraphics[width=1.0\textwidth]{figures/Bob}
-        \caption{Client 2}
-        \label{fig:secondserver}
-    \end{subfigure}
-
-    \begin{subfigure}[b]{0.8\textwidth}
-        \includegraphics[width=1.0\textwidth]{figures/Cam}
-        \caption{Client 3}
-        \label{fig:thirdserver}
-    \end{subfigure} 
-        
-    \begin{subfigure}[b]{0.8\textwidth}
-        \includegraphics[width=1.0\textwidth]{figures/Dave}
-        \caption{Client 4}
-        \label{fig:fourthserver}
-    \end{subfigure}    
-
+	\centering
+    \includegraphics[width=0.8\textwidth]{figures/ServerB}
+    \caption{Servidor secondari \label{fig:secondserver}}    
 \end{figure}
+
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=0.8\textwidth]{figures/Al}
+    \caption{Client 1 \label{fig:firstclient}}    
+\end{figure}
+    
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=0.8\textwidth]{figures/Bob}
+    \caption{Client 2 \label{fig:secondserver}}    
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=0.8\textwidth]{figures/Cam}
+    \caption{Client 3 \label{fig:thirdserver}}    
+\end{figure} 
+    
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=0.8\textwidth]{figures/Dave}
+    \caption{Client 4 \label{fig:fourthserver}}    
+\end{figure}    
+
+S'ha pogut veure que tots els clients es poden comunicar entre si, malgrat es conecten amb servidors diferents.
+Es pot concluïr que els servidors desenvolupen la funció de relay correctament. 
 
 \section{Open questions}
 
 % Try to answer all the open questions in the documentation. When possible, do
 % experiments to support your answers.
+
+Implementació 1
+El disseny del sistema presenta diverses deficiències. En primer lloc la topologia de l'aplicació presenta un únic punt de fallada, és a dir, tot el sistema queda inutilitzat en el cas que el servidor esdevingui inoperatiu. 
+
+En segon lloc, no permet escalar instàncies de servidor segons el número de peticions. Si es publiquen més events, concurrents, dels que el servidor pot assumir, els missatges es perderan.
+Es pot afirmar que el servidor és un coll d'ampolla i que la implementació 1 no escalaria correctament en nombre de clients. 
+
+Els missatges són enviats sense metadades, per tant, no es pot controlar l'ordre d'aparició dels missatges. Tan aviat arriben els missatges el servidor, aquest els propaga. Els clients poden tenir latències de comunicació diferents i per tant dos missatges enviats al mateix temps des clients diferents mai arribarana la resta de clients al mateix temps. A més erlang implementa l'ordre dels missatges....!!!!!
+
+Existeixen diferents solucions que permetrien que els missatges es mostressin amb l'ordre en que han estat generats, totes elles requereixen que hi hagi més transferència de dades i per tant que es s'evolucioni el codi del seminàri. 
+
+Per últim dir que la implementació del sistema de ''chat'' no disposa de comunicació transaccional. No hi ha verificació de que els missatges arribin de manera consisten al seu destinatari. També cal remarcar que si un usuari abandona el ''chat'' i si torna a unir més tard, tots els missatges rebuts durant l'absència no seran entregats. 
+De nou es pot solucionar aquesta restricció afegint complexitat en el servidor. Caldria, per exemple, implementar un sistema de bústies. 
+
+
+
 
 \section{Personal Opinion}
 
