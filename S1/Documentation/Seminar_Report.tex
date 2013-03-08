@@ -165,19 +165,28 @@ Es pot concluïr que els servidors desenvolupen la funció de relay correctament
 % experiments to support your answers.
 
 Implementació 1
+
 El disseny del sistema presenta diverses deficiències. En primer lloc la topologia de l'aplicació presenta un únic punt de fallada, és a dir, tot el sistema queda inutilitzat en el cas que el servidor esdevingui inoperatiu. 
 
 En segon lloc, no permet escalar instàncies de servidor segons el número de peticions. Si es publiquen més events, concurrents, dels que el servidor pot assumir, els missatges es perderan.
 Es pot afirmar que el servidor és un coll d'ampolla i que la implementació 1 no escalaria correctament en nombre de clients. 
 
-Els missatges són enviats sense metadades, per tant, no es pot controlar l'ordre d'aparició dels missatges. Tan aviat arriben els missatges el servidor, aquest els propaga. Els clients poden tenir latències de comunicació diferents i per tant dos missatges enviats al mateix temps des clients diferents mai arribarana la resta de clients al mateix temps. A més erlang implementa l'ordre dels missatges....!!!!!
+Els missatges són enviats sense metadades, per tant, no es pot controlar l'ordre d'aparició dels missatges. Tan aviat arriben els missatges el servidor, aquest els propaga. Els clients poden tenir latències de comunicació diferents i per tant dos missatges enviats al mateix temps des de processos erlang diferents mai arribaran a la resta de clients al mateix temps. A més el llenguatge garanteix que l'ordre de missatges es preservar\`a sempre que ambdos missatges provinguin de la mateixa inst\`ancia d'erlang.
 
 Existeixen diferents solucions que permetrien que els missatges es mostressin amb l'ordre en que han estat generats, totes elles requereixen que hi hagi més transferència de dades i per tant que es s'evolucioni el codi del seminàri. 
 
 Per últim dir que la implementació del sistema de ''chat'' no disposa de comunicació transaccional. No hi ha verificació de que els missatges arribin de manera consisten al seu destinatari. També cal remarcar que si un usuari abandona el ''chat'' i si torna a unir més tard, tots els missatges rebuts durant l'absència no seran entregats. 
 De nou es pot solucionar aquesta restricció afegint complexitat en el servidor. Caldria, per exemple, implementar un sistema de bústies. 
 
+Implementació 2
 
+En el cas que un servidor esdevingui inoperatiu, tots els seus clients es veuran aïllats. No podran rebre ni enviar missatges. Tot i això, la resta de servidors amb els respectius clients seguiran funcionant.
+Una possible solució seria implementar un \textit{failover} autom\`atic, en el qual els clients tinguessin una llista dels servidors disponibles i s'hi puguessin conectar en cas de necessitat.
+
+L'ordre dels missatges no es pot garantir pels mateixos motius que s'han exposat per l'implementació 1.
+
+La segona implementació presenta punts de millora respecte la primera. Permet escalar horitzontalment instàncies de servidor per tal de repartir la càrrega de peticions o per \textit{conectar} diferents grups de clients. També millora en el fet que segmenta els clients, és a dir, permet agrupar-los. Aquest fet aporta robustès en el sistema distribuit ja que es poden migrar grups sencers entre servidors si s'escau. 
+També cal remarcar que la segona implementació aporta més fiabilitat al sistema. Afegint servidors es garanteix que si un d'ells falla tot el clúster no es veurà afectat. El servei es veurà degradat, però gran part dels clients seguiran funcionant. 
 
 
 \section{Personal Opinion}
