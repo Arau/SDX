@@ -159,7 +159,7 @@ A continuació es presenten les imatges que certifiquen les comunicacions entre 
 S'ha pogut veure que tots els clients es poden comunicar entre si, malgrat es conecten amb servidors diferents.
 Es pot concluïr que els servidors desenvolupen la funció de relay correctament. 
 
-\section{Open questions}
+\section{Preguntes directes}
 
 % Try to answer all the open questions in the documentation. When possible, do
 % experiments to support your answers.
@@ -188,8 +188,10 @@ L'ordre dels missatges no es pot garantir pels mateixos motius que s'han exposat
 La segona implementació presenta punts de millora respecte la primera. Permet escalar horitzontalment instàncies de servidor per tal de repartir la càrrega de peticions o per \textit{conectar} diferents grups de clients. També millora en el fet que segmenta els clients, és a dir, permet agrupar-los. Aquest fet aporta robustès en el sistema distribuit ja que es poden migrar grups sencers entre servidors si s'escau. 
 També cal remarcar que la segona implementació aporta més fiabilitat al sistema. Afegint servidors es garanteix que si un d'ells falla tot el clúster no es veurà afectat. El servei es veurà degradat, però gran part dels clients seguiran funcionant. 
 
+Per contra la implementació 2 afegeix complexitat que en ocasions pot esdevenir innecessària. També augmenta el temps de comunicació entre clients ja que els missatges han de fer diversos salts per arribar al desti. Com la implementació 1 només disposa d'un únic servidor el nombre màxim de salts serà un. 
 
-\section{Personal Opinion}
+
+\section{Opinió personal}
 
 % Your personal opinion of the seminar, including whether it should be included
 % in next year's course or not.
