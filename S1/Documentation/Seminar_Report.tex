@@ -47,14 +47,10 @@ En segon lloc, cal desenvolupar un sistema més robust ja que la primera
 implementació presenta un únic punt de fallada crític, el servidor. Consisteix
 en disposar de diverses instàncies ''Servidor'' i que aquestes es comuniquin
 entre si. Els clients poden establir conexió amb qualsevol dels servidors i
-aquests facilitaran els missatges rebuts a la resta de servidors propagant així
+aquests facilitaran els missatges rebuts a la resta propagant així
 els missatges fins als clients últims.
 
 \section{Feina de laboratori}
-
-% Present the new code that you have added or how you have implemented a
-% required functionality by using small Erlang code snippets (you do not need to
-% copy\&paste all the code).
 
 A continuació es presenten les dues implementacions del sistema de ''chat''. Es
 mostren les diferències entre el codi original i el de producció mitjançant les
@@ -63,13 +59,29 @@ eines de ''history'' que proporciona el repositori utilitzat.
 Es pot consultar el codi d'aquesta sessió a
 \url{https://github.com/magarcia/SDX/tree/master/S1}
 
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=1.0\textwidth]{figures/client}
+    \caption{Codi del client \label{fig:clientcode}}    
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=1.0\textwidth]{figures/server}
+    \caption{Codi del servidor \label{fig:servercode}}    
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=1.0\textwidth]{figures/multiserver}
+    \caption{Codi servior2 \label{fig:servercode2}}    
+\end{figure}
 
 \section{Experiments}
 
-% Describe the experiments you did and provide evidence of the results you got
-% (e.g., use screenshots). In addition, you may provide figures or tables with
-% experimental results of the system evaluation. For each seminar, we will
-% provide you with some guidance on which kind of evaluation you should do.
+\begin{center} 
+    \textbf{Implementació 1}
+\end{center}
 
 Per la primera implementació s'ha provat que el ''chat'' era funcional, és a
 dir, s'ha vist que diversos clients es podien comunicar entre si. Tots els
@@ -79,9 +91,6 @@ s'ha vist afectada.
 
 A continuació es mostren les imatges que corroboren les proves fetes.
 
-\begin{center} 
-    \textbf{Implementació 1}
-\end{center}
 
 \begin{figure}[H]
     \centering   
@@ -107,18 +116,21 @@ A continuació es mostren les imatges que corroboren les proves fetes.
     \caption{Tercer Client \label{fig:Impl1_Cam}}	
 \end{figure}
 
-S'ha pogut veure que els clients Alice, Bob i Cam es poden comunicar entre si. 
+S'ha pogut veure que els clients Alice, Bob i Cam es poden comunicar entre si. Tots els clients poden veure tota la conversa. 
 
+Cal remarcar que els clients només veuran els missatges que siguin enviats després de adherir-se al ''chat''.
 
-La segona implementació consta de dos servidors i quatre clients. Els clients Al i Bob estan conectats al servidor A, el primari. En canvi els clients Cam i Dave es comuniquen mitjançant el servidor secondari, el B.
-
-Si es desconecta el servidor secondari els clients Cam i Dave no poden enviar ni rebre events de manera que queden desconectats del ''chat''. 
-
-A continuació es presenten les imatges que certifiquen les comunicacions entre els diferents clients. 
 
 \begin{center} 
     \textbf{Implementació 2}
 \end{center}
+
+La segona implementació consta de dos servidors i quatre clients. Els clients Al i Bob estan conectats al servidor A, el primari. En canvi els clients Cam i Dave es comuniquen mitjançant el servidor secondari, el B.
+
+Si es desconecta el servidor secondari els clients Cam i Dave no poden enviar ni rebre events de manera que queden desconectats del ''chat''. El mateix passa si es desconecta el servidor principal. 
+En el moment que un servidor queda inutilitzat els seus clients perden l'accés a la conversa.
+
+A continuació es presenten les imatges que certifiquen les comunicacions entre els diferents clients. 
 
 \begin{figure}[H]
 	\centering
@@ -168,14 +180,14 @@ Implementació 1
 
 El disseny del sistema presenta diverses deficiències. En primer lloc la topologia de l'aplicació presenta un únic punt de fallada, és a dir, tot el sistema queda inutilitzat en el cas que el servidor esdevingui inoperatiu. 
 
-En segon lloc, no permet escalar instàncies de servidor segons el número de peticions. Si es publiquen més events, concurrents, dels que el servidor pot assumir, els missatges es perderan.
+En segon lloc, no permet escalar instàncies de servidor segons el nombre de peticions. Si es publiquen més events, concurrents, dels que el servidor pot assumir, els missatges es perden.
 Es pot afirmar que el servidor és un coll d'ampolla i que la implementació 1 no escalaria correctament en nombre de clients. 
 
 Els missatges són enviats sense metadades, per tant, no es pot controlar l'ordre d'aparició dels missatges. Tan aviat arriben els missatges el servidor, aquest els propaga. Els clients poden tenir latències de comunicació diferents i per tant dos missatges enviats al mateix temps des de processos erlang diferents mai arribaran a la resta de clients al mateix temps. A més el llenguatge garanteix que l'ordre de missatges es preservar\`a sempre que ambdos missatges provinguin de la mateixa inst\`ancia d'erlang.
 
 Existeixen diferents solucions que permetrien que els missatges es mostressin amb l'ordre en que han estat generats, totes elles requereixen que hi hagi més transferència de dades i per tant que es s'evolucioni el codi del seminàri. 
 
-Per últim dir que la implementació del sistema de ''chat'' no disposa de comunicació transaccional. No hi ha verificació de que els missatges arribin de manera consisten al seu destinatari. També cal remarcar que si un usuari abandona el ''chat'' i si torna a unir més tard, tots els missatges rebuts durant l'absència no seran entregats. 
+Per últim dir que la implementació del sistema de ''chat'' no disposa de comunicació transaccional. No hi ha verificació de que els missatges arribin de manera consistent al seu destinatari. També cal remarcar que si un usuari abandona el ''chat'' i s'hi torna a unir més tard, tots els missatges rebuts durant l'absència no seran entregats. 
 De nou es pot solucionar aquesta restricció afegint complexitat en el servidor. Caldria, per exemple, implementar un sistema de bústies. 
 
 Implementació 2
@@ -183,19 +195,24 @@ Implementació 2
 En el cas que un servidor esdevingui inoperatiu, tots els seus clients es veuran aïllats. No podran rebre ni enviar missatges. Tot i això, la resta de servidors amb els respectius clients seguiran funcionant.
 Una possible solució seria implementar un \textit{failover} autom\`atic, en el qual els clients tinguessin una llista dels servidors disponibles i s'hi puguessin conectar en cas de necessitat.
 
-L'ordre dels missatges no es pot garantir pels mateixos motius que s'han exposat per l'implementació 1.
+L'ordre dels missatges no es pot garantir pels mateixos motius que s'han exposat en l'implementació 1.
 
-La segona implementació presenta punts de millora respecte la primera. Permet escalar horitzontalment instàncies de servidor per tal de repartir la càrrega de peticions o per \textit{conectar} diferents grups de clients. També millora en el fet que segmenta els clients, és a dir, permet agrupar-los. Aquest fet aporta robustès en el sistema distribuit ja que es poden migrar grups sencers entre servidors si s'escau. 
-També cal remarcar que la segona implementació aporta més fiabilitat al sistema. Afegint servidors es garanteix que si un d'ells falla tot el clúster no es veurà afectat. El servei es veurà degradat, però gran part dels clients seguiran funcionant. 
+La segona implementació presenta punts de millora respecte la primera. Permet escalar horitzontalment instàncies de servidor per tal de repartir la càrrega de peticions o per \textit{conectar} diferents grups de clients. També millora en el fet que segmenta els clients, és a dir, permet agrupar-los. Aquest fet aporta robustès en el sistema distribuit ja que es podrien arribar migrar grups sencers entre servidors si s'escau. 
+
+Cal remarcar que la segona implementació aporta més fiabilitat al sistema. Afegint servidors es garanteix que si un d'ells falla tot el clúster no es veurà afectat. El servei es veurà degradat, però gran part dels clients seguiran funcionant. 
 
 Per contra la implementació 2 afegeix complexitat que en ocasions pot esdevenir innecessària. També augmenta el temps de comunicació entre clients ja que els missatges han de fer diversos salts per arribar al desti. Com la implementació 1 només disposa d'un únic servidor el nombre màxim de salts serà un. 
 
 
 \section{Opinió personal}
 
-% Your personal opinion of the seminar, including whether it should be included
-% in next year's course or not.
+El seminari ha resultat molt constructiu. Donat que els autors d'aquest document no hem treballat amb erlang abans de l'assignatura, resulta molt bo poder veure exemples de codi ja fet i treballar amb ells. Haver de començar un codi des de zero en un llenguatge nou, per nosaltres, provocaria que ens retrassesim molt amb la resta d'objectius. Entenem que facilitar el codi en els primers seminàris de la assignatura és un fet positiu. 
 
+També valorem molt positivament que el report dels events s'estudii paral·lelament al seminari ja que hem pogut veure i entendre un tipus d'arquitectura distribuida amb més fonaments.
+
+És molt adient que en una sola sessió hi hagi un desenvolupament incremental dels conceptes perquè permet entendre la base i aprofundir més en l'evolució. En altres assignatures s'acostuma a implementar la base o a anar directament a una implementació més complexa. 
+
+Per últim dir que ens ha agradat aquest seminari perquè permet implementar un sistema utilitzat en el \textit{món real}, malgrat que de manera senzilla. Ens ha sorprès que es poguès desenvolupar un sistema de ''chat'' de manera tan simple.
 
 \end{document}
 
