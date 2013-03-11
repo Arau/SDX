@@ -25,12 +25,12 @@ process_requests(Clients, Servers) ->
 
         {client_join_req, Name, From} ->
             NewClients = [From | Clients],                      %% Add new client to the list
-            broadcast(NewClients, {join, Name}),
+            broadcast(Servers, {join, Name}),
             process_requests(NewClients, Servers);              %% Listen remaining
 
         {client_leave_req, Name, From} ->
             NewClients = lists:delete({Name, From}, Clients),   %% Delete client from list
-            broadcast(Clients, {leave, Name}),                  %% Notify user logoff to rest of clients
+            broadcast(Servers, {leave, Name}),                  %% Notify user logoff to rest
             From ! exit,
             process_requests(NewClients, Servers);              %% Listen remaining
 
@@ -49,7 +49,6 @@ process_requests(Clients, Servers) ->
         {server_join_req, From} ->
             NewServers = [From | Servers],                       %% Add new server to list
             broadcast(NewServers, {update_servers, NewServers}), %% Notify to servers new connected server.
-            broadcast(Clients,{update_servers, From}),           %% Notify to clients new connected server.
             process_requests(Clients, NewServers);
 
         {update_servers, NewServers} ->
