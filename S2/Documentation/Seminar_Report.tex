@@ -53,8 +53,10 @@ eines de ''history'' que proporciona el repositori utilitzat.
 Es pot consultar el codi d'aquesta sessió a
 \url{https://github.com/magarcia/SDX/tree/master/S2}
 
-La primera implementació és donada per l'assignatura i no ha estat necessari modificar-la. No obstant, s'han fet les proves recomanades. S'ha pogut apreciar els diversos comportaments del sistema modificant els paràmetres de \texttt{Sleep} i \texttt{Work}.
+La primera implementació és donada per l'assignatura i no ha estat necessari modificar-la. No obstant, s'han fet les proves recomanades. S'ha pogut apreciar els diversos comportaments del sistema modificant els paràmetres de \texttt{Sleep} i \texttt{Work}. \\ 
+A continuació es mostren les estadístiques generades a partir de les proves.
 
+La segona implementació consisteix en solucionar els possibles deadlocks. Per fer-ho s'ha utilitzat un sistema de prioritats a partir d'identificadors lògics de node. El node més petit és el que té prioritat, alhora d'entrar a la regió crítica, en cas d'empat. 
 
 
 
