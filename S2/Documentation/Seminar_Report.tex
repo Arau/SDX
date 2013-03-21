@@ -1,0 +1,70 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage[utf8]{inputenc} % Change according your file encoding
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[margin=1in]{geometry}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+
+\usepackage[catalan,english]{babel}
+
+
+%% Estil de Paràgraf
+\setlength{\parskip}{4mm}
+\setlength{\parindent}{0mm}
+
+%% Estil lletra
+\renewcommand{\familydefault}{\sfdefault}
+
+
+%% Estil de Paràgraf
+\setlength{\parskip}{4mm}
+\setlength{\parindent}{0mm}
+
+%opening
+\title{Seminar Report: Mutty}
+\author{Martín Garcia \and Ferran Arau}
+\date{\today{}}
+
+\begin{document}
+
+\maketitle
+
+\section{Introducció}
+
+% Introduce in a couple of sentences the seminar and the main topic related to
+% distributed systems it covers.
+
+El seminari té com objectiu implementar un sistema d'exclusió mutua entre diferents nodes d'un sistema distribuït. 
+
+Cada node disposa d'una regió crítica associada. En aquest cas la regió crítica és un codi artificial que ''dorm'' durant un temps quan és executat, s'anomena \textit{worker}. No pot haver més d'un node executant el seu \textit{worker} simultàniament. 
+
+Donat l'escenàri exposat cal implementar en erlang el sistema de comunicacions entre els processos per tal de garantir l'exclusió mutua, així com els possibles deadlocks. 
+
+La tècnica utilitzada per dur a terme la implementació és l'exposada pel document \textit{An optimal Algorithm for mutual Exclusion in Computer Networks} publicat per en Glen Ricart i l’Ashok K. Agrawala.
+
+\section{Feina de laboratori}
+
+A continuació es presenten les tres implementacions del sistema de locks. Es
+mostren les diferències entre el codi original i el de producció mitjançant les
+eines de ''history'' que proporciona el repositori utilitzat. 
+
+Es pot consultar el codi d'aquesta sessió a
+\url{https://github.com/magarcia/SDX/tree/master/S2}
+
+La primera implementació és donada per l'assignatura i no ha estat necessari modificar-la. No obstant, s'han fet les proves recomanades. S'ha pogut apreciar els diversos comportaments del sistema modificant els paràmetres de \texttt{Sleep} i \texttt{Work}.
+
+
+
+
+\section{Preguntes directes}
+
+% Try to answer all the open questions in the documentation. When possible, do
+% experiments to support your answers.
+
+\section{Opinió personal}
+
+
+\end{document}
+
