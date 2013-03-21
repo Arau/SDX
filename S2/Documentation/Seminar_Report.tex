@@ -16,12 +16,7 @@
 
 %% Estil lletra
 \renewcommand{\familydefault}{\sfdefault}
-
-
-%% Estil de Paràgraf
-\setlength{\parskip}{4mm}
-\setlength{\parindent}{0mm}
-
+ 
 %opening
 \title{Seminar Report: Mutty}
 \author{Martín Garcia \and Ferran Arau}
@@ -53,12 +48,41 @@ eines de ''history'' que proporciona el repositori utilitzat.
 Es pot consultar el codi d'aquesta sessió a
 \url{https://github.com/magarcia/SDX/tree/master/S2}
 
+\subsection{Lock1}
+
 La primera implementació és donada per l'assignatura i no ha estat necessari modificar-la. No obstant, s'han fet les proves recomanades. S'ha pogut apreciar els diversos comportaments del sistema modificant els paràmetres de \texttt{Sleep} i \texttt{Work}. \\ 
 A continuació es mostren les estadístiques generades a partir de les proves.
 
+\subsubsection{Prova amb Sleep 2000, Work 2000}
+
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=1.0\textwidth]{figures/2000-2000lock1}
+    \caption{Sleep 2000, Work 2000 \label{fig:2000-2000lock1}}    
+\end{figure}
+
+
+Es pot veure que l'execució és l'esperada. El \texttt{withdrawal} és de 8 segons, tal i com està per defecte. En la figure~\ref{fig:2000-2000lock1} es pot veure que aquest valor està a zero per tots els clients. Per tant, no hi ha cap d'ells que s'hagi vist obligat a rellançar la petició d'accés a regió crítica. \\ 
+Donat que el temps de sleep és ''gran'' no es forcen locks. 
+
+\subsubsection{Prova amb Sleep 20, Work 16000}
+
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=1.0\textwidth]{figures/20-16000lock1}
+    \caption{Sleep 20, Work 16000 \label{fig:20-16000lock1}}    
+\end{figure}
+
+En aquest experiment s'ha forçat que els workers sol·licitin accés a regió crítica de manera molt freqüent, en proporció a la finestra de temps que un worker necessita per executar-se.  
+Es pot apreciar a la figure~\ref{fig:20-16000lock1} 
+
+\subsubsection{Prova amb Sleep 20, Work 20}
+
+\subsection{Lock2}
+
 La segona implementació consisteix en solucionar els possibles deadlocks. Per fer-ho s'ha utilitzat un sistema de prioritats a partir d'identificadors lògics de node. El node més petit és el que té prioritat, alhora d'entrar a la regió crítica, en cas d'empat. 
 
-
+\subsection{Lock3}
 
 \section{Preguntes directes}
 
