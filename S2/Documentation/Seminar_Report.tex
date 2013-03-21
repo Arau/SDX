@@ -74,9 +74,18 @@ Donat que el temps de sleep és ''gran'' no es forcen locks.
 \end{figure}
 
 En aquest experiment s'ha forçat que els workers sol·licitin accés a regió crítica de manera molt freqüent, en proporció a la finestra de temps que un worker necessita per executar-se.  
-Es pot apreciar a la figure~\ref{fig:20-16000lock1} 
+Es pot apreciar a la figure~\ref{fig:20-16000lock1} que el rendiment del sistema baixa notòriament. El temps mig d'espera augmenta molt amb aquesta prova degut a que hi ha molts intents d'accés a regió crítica no resolts. El paràmetre \texttt{withdrawal} ha augmentat perquè hi ha molts processos que es veuen forçats a fer el timeout i sol·licitar accés a regió crítica de nou.
 
 \subsubsection{Prova amb Sleep 20, Work 20}
+
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=1.0\textwidth]{figures/20-20lock1}
+    \caption{Sleep 20, Work 20 \label{fig:20-20lock1}}    
+\end{figure}
+
+Per concloure les proves fetes sobre la implementació \textit{lock1} s'ha estudiat el comportament amb valors de \texttt{Sleep} i \texttt{Work} ''petits''. 
+En aquest experiment s'ha pogut veure que el sistema distribuit pateix un deadlock. Tots els nodes executen la sol·licitud d'accés a les regions crítiques respectivament al mateix temps. Això provoca que tots vegin que la seva sol·licitud és la prioritària i per tant no validin la resta de requests.
 
 \subsection{Lock2}
 
