@@ -42,7 +42,7 @@ wait(Nodes, Master, Refs, Waiting, Id, Clock, Rclock) ->
             if
                 Rclock > Rclock2 ->
                     From ! {ok, Ref, Newclock},
-                    wait(Nodes, Masterm Refs, Waiting, Id, Newclock, Rclock);
+                    wait(Nodes, Master, Refs, Waiting, Id, Newclock, Rclock);
 
                 Rclock == Rclock2 ->
                     if
@@ -56,10 +56,11 @@ wait(Nodes, Master, Refs, Waiting, Id, Clock, Rclock) ->
 
                 true ->
                     wait(Nodes, Master, Refs, [{From, Ref}|Waiting], Id, Newclock, Rclock)
+            end;
 
 
         {ok, Ref, Rclock3} ->
-            Newclock2 = lists:max([Clock, Rclock3]) + 1
+            Newclock2 = lists:max([Clock, Rclock3]) + 1,
             Refs2 = lists:delete(Ref, Refs),
             wait(Nodes, Master, Refs2, Waiting, Id, Newclock2, Rclock);
 
