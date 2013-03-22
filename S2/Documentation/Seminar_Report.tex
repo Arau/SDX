@@ -49,12 +49,10 @@ publicat per en Glen Ricart i l’Ashok K. Agrawala.
 
 \section{Feina de laboratori}
 
-A continuació es presenten les tres implementacions del sistema de locks. Es
-mostren les diferències entre el codi original i el de producció mitjançant les
-eines de ''history'' que proporciona el repositori utilitzat. 
+En el laboratori s'han fet les proves d'execució i posterior analisi de les tres implementacions sol·licitades. 
+Donat que el primer codi ja estava implementat únicament s'han fet les proves. En canvi s'han aplicat les modificacions necessaries per a executar el lock2 i el lock3. 
 
-Es pot consultar el codi d'aquesta sessió a
-\url{https://github.com/magarcia/SDX/tree/master/S2}
+Es pot consultar el codi d'aquesta sessió a \url{https://github.com/magarcia/SDX/tree/master/S2} així com en els fitxers adjunts a l'entrega.
 
 \subsection{Lock1}
 
@@ -142,8 +140,8 @@ forçats a fer el timeout i sol·licitar accés a regió crítica de nou.
 % Paul: 350 locks taken, 409.92857142857144 ms (avg) for taking, 16 withdrawals
 % (muty@localhost)6>
 
-Per concloure les proves fetes sobre la implementació \textit{lock1} s'ha
-estudiat el comportament amb valors de \texttt{Sleep} i \texttt{Work}
+Per concloure les proves fetes sobre la implementació \textit{lock1} s'exposa la següent prova. \\
+S'ha estudiat el comportament amb valors de \texttt{Sleep} i \texttt{Work}
 ''petits''. En aquest experiment s'ha pogut veure que el sistema distribuït
 pateix un \emph{deadlock}. Tots els nodes executen la sol·licitud d'accés a les regions
 crítiques respectivament al mateix temps. Això provoca que tots vegin que la
@@ -200,6 +198,10 @@ La prova utilitzant \texttt{Sleep} i de \texttt{Work} elevats no força conflict
 % John: 26 locks taken, 3872.5 ms (avg) for taking, 18 withdrawals
 % (muty@localhost)4>
 
+En la figure~\ref{fig:20-16000lock2} es pot apreciar que hi ha dos processos que no han tingut opcions d'entrar a la seva regió crítica. Sempre que ha hagut un conflicte els nodes amb identificador petit han perdut. \\
+Aquest fet planteja un greu problema amb la implementació 2. Un sistema distribuït ha de garantir que tots els processos podran executar-se en un moment o altre. 
+
+Es pot concloure que establir prioritats segons paràmetres que no canvien no és una opció adequada en el cas que es vulgui equitat en les condicions. Caldria aplicar noves tènciques per evitar l'\texttt{starvation} de processos.
 
 
 \subsubsection{Prova amb Sleep 20, Work 20}
@@ -220,7 +222,7 @@ La prova utilitzant \texttt{Sleep} i de \texttt{Work} elevats no força conflict
 % Ringo: 2300 locks taken, 15.862173913043478 ms (avg) for taking, 1 withdrawals
 % (muty@localhost)6>
 
-Es pot apreciar que els resultats de la implementació 2 quan es forcen conflictes són molt millors que amb el \textit{Lock1}. Com es resolen els conflictes mitjançant les prioritats per identificador, els processos apenes arriben a esperar-se al timeout. 
+Es pot apreciar que els resultats de la implementació 2, quan es forcen conflictes són molt millors que amb el \textit{Lock1}. Donat que es resolen els conflictes mitjançant les prioritats per identificador, els processos apenes arriben a esperar-se al timeout. 
 
 \subsection{Lock3}
 
@@ -244,6 +246,9 @@ Es pot apreciar que els resultats de la implementació 2 quan es forcen conflict
 % John: 23 locks taken, 1909.7391304347825 ms (avg) for taking, 0 withdrawals
 % (muty@localhost)13>
 
+La solució 3 permet ordenar les peticions, per tant, no existirà la possibilitat que un procés quedi retrassat i per tant, que hagi de generar una nova request per timeout. 
+Aquesta funcionalitat aporta una millora substancial quan es disposa de moltes requests amb temps d'espera alt. No obstant, no és el cas de la figure~\ref{fig:2000-2000lock3}. Per tant, no s'aprecien diferències significatives entre la implementació 1, 2 i 3. Pot ser el temps mig augmenta degut al overhead de dades que es generen, però podria ser negligible. 
+
 \subsubsection{Prova amb Sleep 20, Work 16000}
 
 \begin{figure}[H]
@@ -262,6 +267,8 @@ Es pot apreciar que els resultats de la implementació 2 quan es forcen conflict
 % Paul: lock released
 % Paul: 5 locks taken, 6937.6 ms (avg) for taking, 5 withdrawals
 % (muty@localhost)11>
+
+Es pot apreciar que el nombre de timeouts per aquesta prova ha disminuït significativament respecte la implentació 1 i 2. Això es degut a que les requests mantenen ordre. De mitjana els workers hauran de esperar-se el mateix temps que amb les altres implementacions, però s'aconsegueix distribuir el temps de espera entre els diveros processos. 
 
 \subsubsection{Prova amb Sleep 20, Work 20}
 
@@ -283,6 +290,8 @@ Es pot apreciar que els resultats de la implementació 2 quan es forcen conflict
 % Ringo: 617 locks taken, 22.60291734197731 ms (avg) for taking, 0 withdrawals
 % (muty@localhost)15>
 
+La última prova feta sobre la implementació 3 indica que el temps mig d'accés millora. Així com el \texttt{liveness} dels processos.
+
 \section{Preguntes directes}
 
 % Try to answer all the open questions in the documentation. When possible, do
@@ -294,9 +303,22 @@ La pèrdua de rendiment es soluciona en les següents implementacions, donat que
 
 \subsection{Pregunta 2 - (Lock2) Justify how you guarantee that only one process is in the critical section at any time}
 
+Per poder accedir a la regió crítica es condició necessària que tots els nodes responguin la request donant el vist i plau al node sol·licitant. Si no és així el node no entrarà. Un node que està accedint a la seva regió crítica no contestarà a possibles requests. Per tant, es pot garantir que dos nodes no entraran al mateix temps.
+
 \subsection{Pregunta 3 - (Lock2) What is the main drawback of lock2 implementation?}
 
+La implementació 2 estableix les prioritats segons el identificador de node. En el cas que hi hagi conflictes sempre guanya el node amb identificador més gran. En conseqüència els nodes amb ID petit poden arribar a patir \texttt{starvation}. 
+Per tant, el \texttt{lock2} no garanteix el concepte de \textit{liveness}
+
+\subsection{Pregunta 4 - (Lock3) Note that the workers are not involved in the Lamport clock. Could we have a situation where a worker is not given the priority to a lock even if it issued a request to its instance before the worker that took the lock?}
+
+La solució 3 garanteix que no hi haurà processos en \texttt{starvation} ja que les prioritats en cas de conflicte s'estableixen a partir de l'ordre en que s'han generat les requests. 
+
 \section{Opinió personal}
+
+El seminàri ha estat constructiu des del punt de vista teòric. El document ''Ricart'' exposa els conceptes necessaris per entendre el seminàri, per tant, creiem que és molt bo tenir-ne accés. 
+
+Pot ser estaria bé poder veure casos reals o exemples de sistemes que utilitzin les técniques apreses. Encara que sigui a títol divulgatiu. 
 
 
 \end{document}
