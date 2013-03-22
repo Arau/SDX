@@ -92,7 +92,43 @@ Ringo: 2300 locks taken, 15.862173913043478 ms (avg) for taking, 1 withdrawals
 # Lock3
 
 ## Sleep 2000 Work 2000
+(muty@localhost)12> muty:stop().
+George: 21 locks taken, 2045.047619047619 ms (avg) for taking, 0 withdrawals
+stop
+Ringo: lock released
+Ringo: 21 locks taken, 1963.3809523809523 ms (avg) for taking, 0 withdrawals
+Paul: lock taken in 3288 ms
+Paul: lock released
+Paul: 20 locks taken, 2175.05 ms (avg) for taking, 0 withdrawals
+John: lock taken in 1467 ms
+John: lock released
+John: 23 locks taken, 1909.7391304347825 ms (avg) for taking, 0 withdrawals
+(muty@localhost)13>
 
 ## Sleep 20 Work 16000
+(muty@localhost)10> muty:stop().
+stop
+Ringo: giving up
+Ringo: 4 locks taken, 4534.5 ms (avg) for taking, 9 withdrawals
+George: giving up
+George: 4 locks taken, 4729.25 ms (avg) for taking, 9 withdrawals
+John: giving up
+John: 5 locks taken, 6631.2 ms (avg) for taking, 9 withdrawals
+Paul: lock released
+Paul: 5 locks taken, 6937.6 ms (avg) for taking, 5 withdrawals
+(muty@localhost)11>
+
 
 ## Sleep 20 Work 20
+(muty@localhost)14> muty:stop().
+George: 623 locks taken, 22.14446227929374 ms (avg) for taking, 0 withdrawals
+stop
+Paul: lock released
+Paul: 616 locks taken, 22.272727272727273 ms (avg) for taking, 0 withdrawals
+John: lock taken in 29 ms
+John: lock released
+John: 622 locks taken, 22.262057877813504 ms (avg) for taking, 0 withdrawals
+Ringo: lock taken in 50 ms
+Ringo: lock released
+Ringo: 617 locks taken, 22.60291734197731 ms (avg) for taking, 0 withdrawals
+(muty@localhost)15>
