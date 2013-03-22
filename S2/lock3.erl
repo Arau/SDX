@@ -13,13 +13,12 @@ open(Nodes, Id, Clock) ->
             wait(Nodes, Master, Refs, [], Id, Clock, Clock);
 
         {request, From, Ref, _, Rclock} ->
-            Newclock = list:max([Clock,Rclock]) + 1,
+            Newclock = lists:max([Clock, Rclock]) + 1, 
             From ! {ok, Ref, Newclock},
             open(Nodes, Id, Newclock);
 
         stop ->
             ok
-
     end.
 
 requests(Nodes, Id, Clock) ->
@@ -35,34 +34,34 @@ wait(Nodes, Master, [], Waiting, Id, Clock, _) ->
     Master ! taken,
     held(Nodes, Waiting, Id, Clock);
 
-wait(Nodes, Master, Refs, Waiting, Id, Clock, Rclock) ->
+wait(Nodes, Master, Refs, Waiting, Id, Clock, Clock2) ->
     receive
-        {request, From, Ref, Rid, Rclock2} ->
-            Newclock = lists:max([Clock, Rclock2]) + 1,
+        {request, From, Ref, Rid, Rclock} ->
+            Newclock = lists:max([Clock, Rclock]) + 1,
             if
-                Rclock > Rclock2 ->
+                Clock2 > Rclock ->
                     From ! {ok, Ref, Newclock},
-                    wait(Nodes, Master, Refs, Waiting, Id, Newclock, Rclock);
+                    wait(Nodes, Master, Refs, Waiting, Id, Newclock, Clock2);
 
-                Rclock == Rclock2 ->
+                Clock2 == Rclock ->
                     if
-                        Id > Rid ->
+                        Id < Rid ->
                             From ! {ok, Ref, Newclock},
-                            wait(Nodes, Master, Refs, Waiting, Id, Newclock, Rclock);
+                            wait(Nodes, Master, Refs, Waiting, Id, Newclock, Clock2);
 
                         true -> 
-                            wait(Nodes, Master, Refs, [{From, Ref}|Waiting], Id, Newclock, Rclock)
+                            wait(Nodes, Master, Refs, [{From, Ref}|Waiting], Id, Newclock, Clock2)
                     end;
 
                 true ->
-                    wait(Nodes, Master, Refs, [{From, Ref}|Waiting], Id, Newclock, Rclock)
+                    wait(Nodes, Master, Refs, [{From, Ref}|Waiting], Id, Newclock, Clock2)
             end;
 
 
-        {ok, Ref, Rclock3} ->
-            Newclock2 = lists:max([Clock, Rclock3]) + 1,
+        {ok, Ref, Rclock2} ->
+            Newclock2 = lists:max([Clock, Rclock2]) + 1,
             Refs2 = lists:delete(Ref, Refs),
-            wait(Nodes, Master, Refs2, Waiting, Id, Newclock2, Rclock);
+            wait(Nodes, Master, Refs2, Waiting, Id, Newclock2, Clock2);
 
         release ->
             ok(Waiting, Clock),
