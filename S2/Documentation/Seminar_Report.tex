@@ -144,7 +144,7 @@ forçats a fer el timeout i sol·licitar accés a regió crítica de nou.
 
 Per concloure les proves fetes sobre la implementació \textit{lock1} s'ha
 estudiat el comportament amb valors de \texttt{Sleep} i \texttt{Work}
-''petits''. En aquest experiment s'ha pogut veure que el sistema distribuit
+''petits''. En aquest experiment s'ha pogut veure que el sistema distribuït
 pateix un \emph{deadlock}. Tots els nodes executen la sol·licitud d'accés a les regions
 crítiques respectivament al mateix temps. Això provoca que tots vegin que la
 seva sol·licitud és la prioritària i per tant no validin la resta de requests.
@@ -178,6 +178,8 @@ regió crítica, en cas d'empat.
 % George: 20 locks taken, 3570.1 ms (avg) for taking, 2 withdrawals
 % (muty@localhost)11>
 
+La prova utilitzant \texttt{Sleep} i de \texttt{Work} elevats no força conflictes de lock, per tant, es poden veure poques diferències entre la implementació 1 i la 2.
+
 \subsubsection{Prova amb Sleep 20, Work 16000}
 
 \begin{figure}[H]
@@ -198,6 +200,8 @@ regió crítica, en cas d'empat.
 % John: 26 locks taken, 3872.5 ms (avg) for taking, 18 withdrawals
 % (muty@localhost)4>
 
+
+
 \subsubsection{Prova amb Sleep 20, Work 20}
 
 \begin{figure}[H]
@@ -215,6 +219,8 @@ regió crítica, en cas d'empat.
 % Ringo: giving up
 % Ringo: 2300 locks taken, 15.862173913043478 ms (avg) for taking, 1 withdrawals
 % (muty@localhost)6>
+
+Es pot apreciar que els resultats de la implementació 2 quan es forcen conflictes són molt millors que amb el \textit{Lock1}. Com es resolen els conflictes mitjançant les prioritats per identificador, els processos apenes arriben a esperar-se al timeout. 
 
 \subsection{Lock3}
 
@@ -281,6 +287,14 @@ regió crítica, en cas d'empat.
 
 % Try to answer all the open questions in the documentation. When possible, do
 % experiments to support your answers.
+
+\subsection{Pregunta 1 -(Lock1) What is happening when you increase the risk of a lock conflict?}
+Foçar el risc de \textit{lock conflict} implica que el rendiment del sistema baixa molt. Els nodes es queden esperant fins que salta el timeout i han de rellançar la request. Això es dóna perquè no els arriben les validacions de la resta de nodes. \\
+La pèrdua de rendiment es soluciona en les següents implementacions, donat que el \textit{lock1} no disposa d'una resolució de conflictes eficient. 
+
+\subsection{Pregunta 2 - (Lock2) Justify how you guarantee that only one process is in the critical section at any time}
+
+\subsection{Pregunta 3 - (Lock2) What is the main drawback of lock2 implementation?}
 
 \section{Opinió personal}
 
