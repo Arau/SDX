@@ -11,7 +11,7 @@ of nodes where one is the elected leader. All nodes that wish to multicast a
 message will send the message to the leader and the leader will do a basic
 multicast to all members of the group. If the leader dies a new leader is
 elected.
-A new node that wishes to enter the group will contact any node in the
+>A new node that wishes to enter the group will contact any node in the
 group and request to join the group. The leader will determine when the
 node is to be included and will deliver a new group view to the group.
 The application layer processes will use this group membership service
