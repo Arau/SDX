@@ -72,5 +72,10 @@ joining(Id, Master, Peer, Peers) ->
 
 
 bcast(_, Msg, Nodes) ->
-    lists:foreach(fun(Node) -> Node ! Msg end, Nodes).
+    %% foreach node in Nodes do Func.
+    lists:foreach(
+                 fun(Node) -> 
+                    Node ! Msg 
+                 end, 
+                 Nodes).
 
