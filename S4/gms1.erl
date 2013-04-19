@@ -25,11 +25,11 @@ leader(Id, Master, Peers) ->
     receive
         {mcast, Msg} ->
             bcast(Id, {msg, Msg}, Peers),     %% Fwd msg to all rest nodes 
-            Master ! {deliver, Msg},          %% Ack to worker    
+            Master ! {deliver, Msg},          %% Reply to worker    
             leader(Id, Master, Peers);
 
         {join, Peer} ->
-            Master ! request                  %% Request to change worker color 
+            Master ! request,                 %% Request to change worker color 
             joining(Id, Master, Peer, Peers); %% Add node to peers list
 
         stop ->
@@ -42,13 +42,13 @@ leader(Id, Master, Peers) ->
 slave(Id, Master, Leader, Peers) ->
     receive
         {mcast, Msg} ->
-            %% TODO: ADD SOME CODE
+            Leader ! {mcast, Msg},              %% Fwd msg from worker to leader
             slave(Id, Master, Leader, Peers);
         {join, Peer} ->
-            %% TODO: ADD SOME CODE
+            Leader ! {join, Peer},              %% Join request to leader
             slave(Id, Master, Leader, Peers);
         {msg, Msg} ->
-            %% TODO: ADD SOME CODE
+            Master ! {deliver, Msg},            %% Reply to worker
             slave(Id, Master, Leader, Peers);
         {view, _, _, View} ->
             slave(Id, Master, Leader, View);
