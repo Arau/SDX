@@ -24,13 +24,13 @@ init(Id, Grp, Master) ->
 leader(Id, Master, Peers) -> 
     receive
         {mcast, Msg} ->
-            bcast(Id, ..., ...), %% TODO: COMPLETE
-            %% TODO: ADD SOME CODE
+            bcast(Id, {msg, Msg}, Peers),     %% Fwd msg to all rest nodes 
+            Master ! {deliver, Msg},          %% Ack to worker    
             leader(Id, Master, Peers);
 
         {join, Peer} ->
-            %% TODO: ADD SOME CODE
-            joining(Id, ..., ..., ...); %% TODO: COMPLETE
+            Master ! request                  %% Request to change worker color 
+            joining(Id, Master, Peer, Peers); %% Add node to peers list
 
         stop ->
             ok;
@@ -62,7 +62,6 @@ slave(Id, Master, Leader, Peers) ->
 joining(Id, Master, Peer, Peers) ->
     receive
         {ok, State} ->
-
             Peers2 = lists:append(Peers, [Peer]),
             bcast(Id, {view, State, self(), Peers2}, Peers2),
             leader(Id, Master, Peers2);
@@ -72,7 +71,7 @@ joining(Id, Master, Peer, Peers) ->
 
 
 bcast(_, Msg, Nodes) ->
-    %% foreach node in Nodes do Func.
+    %% foreach node in Nodes, do Func.
     lists:foreach(
                  fun(Node) -> 
                     Node ! Msg 
