@@ -1,4 +1,4 @@
--module(groupy).
+-module(groupyNodeC).
 -export([start/3, stop/0]).
 
 start(Module, Sleep, Leader) ->
