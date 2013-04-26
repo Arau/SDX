@@ -5,5 +5,5 @@ start(Module, Sleep, Leader, Node, NumNode) ->
     register(Node, worker:start(integer_to_list(NumNode), Module, NumNode, {a, Leader}, Sleep)).
 
 stop() ->
-    b ! stop.
+    Node ! stop.
 
