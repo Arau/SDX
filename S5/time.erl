@@ -5,7 +5,7 @@ now() ->
     {H, M, S} = erlang:time(),
     H*3600+M*60+S.
 
-inf() 
+inf() ->
     inf.
 
 add(S, T) ->
