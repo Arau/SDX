@@ -3,14 +3,10 @@
 
 lookup(Req, Entries) ->
     Tuple = lists:keyfind(Req, 1, Entries),
-    if
-        not Tuple ->
-            unknown;
-
-        true ->
-            Tuple
+    if Tuple == false -> unknown;
+                true ->  Tuple
     end.
 
-%% add(Name, Entry, Entries) ->
+%%add(Name, Entry, Entries) ->
 
-%% remove(Name, Entries) ->
+%%remove(Name, Entries) ->
