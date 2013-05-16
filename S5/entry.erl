@@ -7,6 +7,8 @@ lookup(Req, Entries) ->
                 true ->  Tuple
     end.
 
-%%add(Name, Entry, Entries) ->
+add(Name, Entry, Entries) ->
+    lists:keystore(Name, 1, Entries, {Name, Entry}).
 
-%%remove(Name, Entries) ->
+remove(Name, Entries) ->
+    lists:keydelete(Name, 1, Entries).
