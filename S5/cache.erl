@@ -17,7 +17,7 @@ lookup(Name, Cache) ->
     end.
 
 add(Name, Expire, Data, Cache) ->
-    lists:keystore(Name, 1, Cache, {Name, Expire, Reply}).
+    lists:keystore(Name, 1, Cache, {Name, Expire, Data}).
 
 remove(Name, Cache) ->
     lists:keydelete(Name, 1, Cache).

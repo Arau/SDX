@@ -2,9 +2,9 @@
 -export([lookup/2, add/3, remove/2]).
 
 lookup(Req, Entries) ->
-    Tuple = lists:keyfind(Req, 1, Entries),
-    if Tuple == false -> unknown;
-                true  -> Tuple
+    case lists:keyfind(Req, 1, Entries) of
+        {_, PID} -> PID;
+        false -> unknown
     end.
 
 add(Name, Entry, Entries) ->
