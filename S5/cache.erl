@@ -5,16 +5,19 @@ new() ->
     [].
 
 lookup(Name, Cache) ->
-    Result = lists:keyfind(Name, 1, Cache),
-    if
-        Result == false         -> unknown;
-        element(1, Result) == 0 -> invalid;
-        true                    -> Result
+    case lists:keyfind(Name, 1, Cache) of
+        {_, Expire, Data} ->
+            Now = time:now(),
+            if
+                Now >= Expire   -> invalid;
+                true            -> {ok, Data}
+            end;
+
+        false -> unknown
     end.
 
-add(Fqdn, Expire, Data, Cache) ->
-    NewCache = [{Fqdn, Expire, Data} | Cache],
-    NewCache.
+add(Name, Expire, Data, Cache) ->
+    lists:keystore(Name, 1, Cache, {Name, Expire, Reply}).
 
 remove(Name, Cache) ->
     lists:keydelete(Name, 1, Cache).
