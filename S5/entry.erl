@@ -4,7 +4,7 @@
 lookup(Req, Entries) ->
     Tuple = lists:keyfind(Req, 1, Entries),
     if Tuple == false -> unknown;
-                true ->  Tuple
+                true  -> Tuple
     end.
 
 add(Name, Entry, Entries) ->
