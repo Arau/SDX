@@ -61,3 +61,18 @@ request(Peer, Predecessor) ->
         {Pkey, Ppid} ->
             Peer ! {status, {Pkey, Ppid}}
     end.
+
+
+notify({Nkey, Npid}, MyKey, Predecessor) ->
+    case Predecessor of
+        nil ->
+            %% TODO: ADD SOME CODE
+
+        {Pkey, _} ->
+            case key:between(Nkey, Pkey, MyKey) of
+            true ->
+                %% TODO: ADD SOME CODE
+            false ->
+                Predecessor
+        end
+    end.
