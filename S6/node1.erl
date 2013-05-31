@@ -21,30 +21,30 @@ init(MyKey, PeerPid) ->
 schedule_stabilize() ->
     timer:send_interval(?Stabilize, self(), stabilize).
 
+stabilize({_, Spid}) ->
+    Spid ! {request, self()}.
+
 stabilize(Pred, MyKey, Successor) ->
     {Skey, Spid} = Successor,
     case Pred of
         nil ->
-            %% TODO: ADD SOME CODE
+            Spid ! {notify,{MyKey, self()}},                %% Send notify msg to my new succesor
             Successor;
         {MyKey, _} ->
             Successor;
         {Skey, _} ->
-            %% TODO: ADD SOME CODE
+            Spid ! {notify, {MyKey, self()}},                %% Send notify msg to my new succesor
             Successor;
         {Xkey, Xpid} ->
             case key:between(Xkey, MyKey, Skey) of
                 true ->
-                    %% TODO: ADD SOME CODE
-                    %% TODO: ADD SOME CODE
+                    connect( _, Pred),                      %% Pred. is my new Successor
+                    self() ! stabilize;                     %% Stabilize my own
                 false ->
-                    %% TODO: ADD SOME CODE
+                    Spid ! {notify, {MyKey, self()}},       %% Send notify msg to my new succesor
                     Successor
             end
     end.
-
-stabilize({_, Spid}) ->
-    Spid ! {request, self()}.
 
 
 -define(Timeout, 5000).
@@ -74,12 +74,12 @@ node(MyKey, Predecessor, Successor) ->
         {notify, New} ->
             Pred = notify(New, MyKey, Predecessor),
             node(MyKey, Pred, Successor);
-        {request, Peer} ->
 
+        {request, Peer} ->
             request(Peer, Predecessor),
             node(MyKey, Predecessor, Successor);
-        {status, Pred} ->
 
+        {status, Pred} ->
             Succ = stabilize(Pred, MyKey, Successor),
             node(MyKey, Predecessor, Succ);
 
