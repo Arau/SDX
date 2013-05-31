@@ -50,7 +50,7 @@ stabilize(Pred, MyKey, Successor) ->
 -define(Timeout, 5000).
 
 connect(MyKey, nil) ->
-    {ok, {... , ...}}; %% TODO: ADD SOME CODE
+    { ok, {MyKey, self()} };                                %% I'm the only node in ring
 
 connect(_, PeerPid) ->
     Qref = make_ref(),
@@ -58,7 +58,7 @@ connect(_, PeerPid) ->
 
     receive
         {Qref, Skey} ->
-            {ok, {... , ...}} %% TODO: ADD SOME CODE
+            { ok, { Skey, PeerPid} }                       %% Succesor replies
 
     after ?Timeout ->
         io:format("Timeout: no response from ~w~n", [PeerPid])
