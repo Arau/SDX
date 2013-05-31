@@ -100,13 +100,13 @@ request(Peer, Predecessor) ->
 notify({Nkey, Npid}, MyKey, Predecessor) ->
     case Predecessor of
         nil ->
-            %% TODO: ADD SOME CODE
+            {Nkey, Npid};                           %% I'm new predecessor
 
         {Pkey, _} ->
             case key:between(Nkey, Pkey, MyKey) of
-            true ->
-                %% TODO: ADD SOME CODE
-            false ->
-                Predecessor
+                true ->
+                    {Nkey, Npid};                   %% I'm new predecessor
+                false ->
+                    Predecessor
         end
     end.
