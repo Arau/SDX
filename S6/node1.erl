@@ -28,7 +28,7 @@ stabilize(Pred, MyKey, Successor) ->
     {Skey, Spid} = Successor,
     case Pred of
         nil ->
-            Spid ! {notify,{MyKey, self()}},                %% Send notify msg to my new succesor
+            Spid ! {notify,{MyKey, self()}},                 %% Send notify msg to my new succesor
             Successor;
         {MyKey, _} ->
             Successor;
@@ -38,10 +38,10 @@ stabilize(Pred, MyKey, Successor) ->
         {Xkey, Xpid} ->
             case key:between(Xkey, MyKey, Skey) of
                 true ->
-                    connect( _, Pred),                      %% Pred. is my new Successor
-                    self() ! stabilize;                     %% Stabilize my own
+                    connect( Xpid, Pred),                    %% Pred. is my new Successor
+                    self() ! stabilize;                      %% Stabilize my own
                 false ->
-                    Spid ! {notify, {MyKey, self()}},       %% Send notify msg to my new succesor
+                    Spid ! {notify, {MyKey, self()}},        %% Send notify msg to my new succesor
                     Successor
             end
     end.
@@ -58,7 +58,7 @@ connect(_, PeerPid) ->
 
     receive
         {Qref, Skey} ->
-            { ok, { Skey, PeerPid} }                       %% Succesor replies
+            { ok, { Skey, PeerPid} }                        %% Succesor replies
 
     after ?Timeout ->
         io:format("Timeout: no response from ~w~n", [PeerPid])
