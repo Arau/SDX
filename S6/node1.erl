@@ -1,7 +1,6 @@
 -module(node1).
 -export([node/3, start/1, start/2]).
 
-
 start(MyKey) ->
     start(MyKey, nil).
 
@@ -15,6 +14,22 @@ init(MyKey, PeerPid) ->
     schedule_stabilize(),
     node(MyKey, Predecessor, Successor).
 
+-define(Timeout, 5000).
+
+connect(MyKey, nil) ->
+    {ok, {MyKey, self()}};                                  %% I'm the only node in ring
+
+connect(_, PeerPid) ->
+    Qref = make_ref(),
+    PeerPid ! {key, Qref, self()},
+    receive
+        {Qref, Skey} ->
+            {ok, {Skey, PeerPid}}                           %% Succesor replies
+
+    after ?Timeout ->
+        io:format("Timeout: no response from ~w~n", [PeerPid])
+
+    end.
 
 -define(Stabilize, 1000).
 
@@ -38,31 +53,12 @@ stabilize(Pred, MyKey, Successor) ->
         {Xkey, Xpid} ->
             case key:between(Xkey, MyKey, Skey) of
                 true ->
-                    connect( Xpid, Pred),                    %% Pred. is my new Successor
-                    self() ! stabilize;                      %% Stabilize my own
+                    Xpid ! {request, self()},                %% Pred. is my new Successor
+                    Pred;                                    %% Stabilize my own
                 false ->
                     Spid ! {notify, {MyKey, self()}},        %% Send notify msg to my new succesor
                     Successor
             end
-    end.
-
-
--define(Timeout, 5000).
-
-connect(MyKey, nil) ->
-    { ok, {MyKey, self()} };                                %% I'm the only node in ring
-
-connect(_, PeerPid) ->
-    Qref = make_ref(),
-    PeerPid ! {key, Qref, self()},
-
-    receive
-        {Qref, Skey} ->
-            { ok, { Skey, PeerPid} }                        %% Succesor replies
-
-    after ?Timeout ->
-        io:format("Timeout: no response from ~w~n", [PeerPid])
-
     end.
 
 node(MyKey, Predecessor, Successor) ->
@@ -85,6 +81,18 @@ node(MyKey, Predecessor, Successor) ->
 
         stabilize ->
             stabilize(Successor),
+            node(MyKey, Predecessor, Successor);
+
+        probe ->
+            create_probe(MyKey, Successor),
+            node(MyKey, Predecessor, Successor);
+
+        {probe, MyKey, Nodes, T} ->
+            remove_probe(MyKey, Nodes, T),
+            node(MyKey, Predecessor, Successor);
+
+        {probe, RefKey, Nodes, T} ->
+            forward_probe(RefKey, [MyKey | Nodes], T, Successor),
             node(MyKey, Predecessor, Successor)
     end.
 
@@ -110,3 +118,16 @@ notify({Nkey, Npid}, MyKey, Predecessor) ->
                     Predecessor
         end
     end.
+
+create_probe(MyKey, {_, Spid}) ->
+    Spid ! {probe, MyKey, [MyKey], erlang:now()},
+    io:format("Create probe ~w!~n", [MyKey]).
+
+remove_probe(MyKey, Nodes, T) ->
+    Time = timer:now_diff(erlang:now(), T),
+    io:format("Received probe ~w in ~w ms Ring: ~w~n", [MyKey, Time, Nodes]).
+
+forward_probe(RefKey, Nodes, T, {_, Spid}) ->
+    Spid ! {probe, RefKey, Nodes, T},
+    io:format("Forward probe ~w!~n", [RefKey]).
+
