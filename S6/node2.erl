@@ -96,8 +96,7 @@ node(MyKey, Predecessor, Successor, Store) ->
             node(MyKey, Predecessor, Successor, Store);
 
        {add, Key, Value, Qref, Client} ->
-            Added = add(Key, Value, Qref, Client,
-                        MyKey, Predecessor, Successor, Store),
+            Added = add(Key, Value, Qref, Client, MyKey, Predecessor, Successor, Store),
             node(MyKey, Predecessor, Successor, Added, Store);
 
         {lookup, Key, Qref, Client} ->
@@ -141,9 +140,23 @@ forward_probe(RefKey, Nodes, T, {_, Spid}) ->
     io:format("Forward probe ~w!~n", [RefKey]).
 
 add(Key, Value, Qref, Client, MyKey, {Pkey, _}, {_, Spid}, Store) ->
+    case key:between(Key, Pkey, MyKey) of               %% Take care of predecessor keys and my own key.
+        true ->
+            Added = storage:add(Key, Value, Store),     %% Adding word to store
+            Client ! {Qref, ok},
+            Added;
+
+        false ->
+            Spid ! {add, Key, Value, Qref, Client},     %% Sending data to my succesor
+            Store
     end.
 
 lookup(Key, Qref, Client, MyKey, {Pkey, _}, {_, Spid}, Store) ->
+    case key:between(Key, Pkey, MyKey) of               %% Check if I takes care of the key
+        true ->
+            Result = storage:lookup(Key, Store),        %% Finding key in Store
+            Client ! {Qref, Result};
+
+        false ->
+            Spid ! {lookup, Key, Qref, Client}          %% Forward lookup
     end.
-
-
