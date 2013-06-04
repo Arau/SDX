@@ -6,11 +6,11 @@ create() ->
 
 add(Key, Value, Store) ->
     case lists:keyfind(Key, 1, Store) of
-    {Key, _} ->
-    io:format("[Store:Add] Key ~w already exists!~n", [Key]),
-    Store;
-    false ->
-    [{Key, Value}|Store]
+        {Key, _} ->
+            io:format("[store:add] key ~w already exists!~n", [key]),
+            Store;
+        false ->
+            [{Key, Value} | Store]
     end.
 
 lookup(Key, Store) ->
