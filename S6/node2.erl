@@ -68,8 +68,8 @@ node(MyKey, Predecessor, Successor, Store) ->
             node(MyKey, Predecessor, Successor, Store);
 
         {notify, New} ->
-            Pred = notify(New, MyKey, Predecessor),
-            node(MyKey, Pred, Successor, Store);
+            {Pred, NewStore} = notify(New, MyKey, Predecessor, Store),
+            node(MyKey, Pred, Successor, NewStore);
 
         {request, Peer} ->
             request(Peer, Predecessor),
@@ -84,7 +84,7 @@ node(MyKey, Predecessor, Successor, Store) ->
             node(MyKey, Predecessor, Successor, Store);
 
         probe ->
-            create_probe(MyKey, Successor),
+            create_probe(MyKey, Successor, Store),
             node(MyKey, Predecessor, Successor, Store);
 
         {probe, MyKey, Nodes, T} ->
@@ -92,16 +92,20 @@ node(MyKey, Predecessor, Successor, Store) ->
             node(MyKey, Predecessor, Successor, Store);
 
         {probe, RefKey, Nodes, T} ->
-            forward_probe(RefKey, [MyKey | Nodes], T, Successor),
+            forward_probe(RefKey, [MyKey | Nodes], T, Successor, Store),
             node(MyKey, Predecessor, Successor, Store);
 
        {add, Key, Value, Qref, Client} ->
             Added = add(Key, Value, Qref, Client, MyKey, Predecessor, Successor, Store),
-            node(MyKey, Predecessor, Successor, Added, Store);
+            node(MyKey, Predecessor, Successor, Added);
 
         {lookup, Key, Qref, Client} ->
             lookup(Key, Qref, Client, MyKey, Predecessor, Successor, Store),
-            node(MyKey, Predecessor, Successor, Store)
+            node(MyKey, Predecessor, Successor, Store);
+
+        {handover, Elements} ->
+            Merged = storage:merge(Store, Elements),
+            node(MyKey, Predecessor, Successor, Merged)
     end.
 
 request(Peer, Predecessor) ->
@@ -113,31 +117,34 @@ request(Peer, Predecessor) ->
     end.
 
 
-notify({Nkey, Npid}, MyKey, Predecessor) ->
+notify({Nkey, Npid}, MyKey, Predecessor, Store) ->
     case Predecessor of
         nil ->
-            {Nkey, Npid};                           %% I'm new predecessor
+            Keep = handover(Store, MyKey, Nkey, Npid),
+            { {Nkey, Npid}, Keep };                                 %% I'm my self predecessor
 
         {Pkey, _} ->
+            io:format("Nkey ~w, Pkey ~w, MyKey ~w ~n",[Nkey, Pkey, MyKey]),
             case key:between(Nkey, Pkey, MyKey) of
                 true ->
-                    {Nkey, Npid};                   %% I'm new predecessor
+                    Keep = handover(Store, MyKey, Nkey, Npid),      %% Forward the rest of list
+                    { {Nkey, Npid}, Keep };                         %% I'm new predecessor
                 false ->
-                    Predecessor
+                    {Predecessor, Store}
         end
     end.
 
-create_probe(MyKey, {_, Spid}) ->
+create_probe(MyKey, {_, Spid}, Store) ->
     Spid ! {probe, MyKey, [MyKey], erlang:now()},
-    io:format("Create probe ~w!~n", [MyKey]).
+    io:format("Create probe ~w!~n Store: ~w~n", [MyKey, Store]).
 
 remove_probe(MyKey, Nodes, T) ->
     Time = timer:now_diff(erlang:now(), T),
     io:format("Received probe ~w in ~w ms Ring: ~w~n", [MyKey, Time, Nodes]).
 
-forward_probe(RefKey, Nodes, T, {_, Spid}) ->
+forward_probe(RefKey, Nodes, T, {_, Spid}, Store) ->
     Spid ! {probe, RefKey, Nodes, T},
-    io:format("Forward probe ~w!~n", [RefKey]).
+    io:format("Forward probe ~w!~n Store: ~w~n", [RefKey, Store]).
 
 add(Key, Value, Qref, Client, MyKey, {Pkey, _}, {_, Spid}, Store) ->
     case key:between(Key, Pkey, MyKey) of               %% Take care of predecessor keys and my own key.
@@ -160,3 +167,10 @@ lookup(Key, Qref, Client, MyKey, {Pkey, _}, {_, Spid}, Store) ->
         false ->
             Spid ! {lookup, Key, Qref, Client}          %% Forward lookup
     end.
+
+%% for list [1,2,3,4,5,6] when MyKey eq 6 and Nkey eq 4
+%%      handover(...): Keep = [5, 6], Leave = [1, 2, 3, 4]
+handover(Store, MyKey, Nkey, Npid) ->
+    {Keep, Leave} = storage:split(MyKey, Nkey, Store),
+    Npid ! {handover, Leave},
+    Keep.
